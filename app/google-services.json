@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "945782319962",
+    "firebase_url": "https://gemfirebaseproject.firebaseio.com",
+    "project_id": "gemfirebaseproject",
+    "storage_bucket": "gemfirebaseproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945782319962:android:ff29498453bd94df",
+        "android_client_info": {
+          "package_name": "com.kierrapalmer.gem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945782319962-td1nm1alkh08gbq8r9ecc3ls5u6hmndg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kierrapalmer.gem",
+            "certificate_hash": "05c69f6b0b850d560fe1b9e5d249849b33ef3fcd"
+          }
+        },
+        {
+          "client_id": "945782319962-dcfi261hs2nlth9vrfoh4806morjr78q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtgHV7nsCbgy0eUasvgvyjbFJEgOUxqTY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945782319962-dcfi261hs2nlth9vrfoh4806morjr78q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
