@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +16,13 @@ import android.widget.ImageView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.kierrapalmer.gem.ListingDetailActivity;
-import com.kierrapalmer.gem.ListingsViewHolder;
+import com.kierrapalmer.gem.ViewHolders.ListingsViewHolder;
 import com.kierrapalmer.gem.Models.Listing;
 import com.kierrapalmer.gem.R;
-import com.squareup.picasso.Picasso;
 
 
 /**
@@ -35,13 +32,8 @@ public class ViewListingsFragment extends Fragment {
     private View rootview;
     private static final String TAG = "PostListFragment";
     private ImageView imgView;
-    private static final int MAX_WIDTH = 100;
-    private static final int MAX_HEIGHT = 100;
     private String category;
-
-    // [START define_database_reference]
     private DatabaseReference mDatabase;
-    // [END define_database_reference]
 
     private FirebaseRecyclerAdapter<Listing, ListingsViewHolder> mAdapter;
     private RecyclerView mRecycler;
@@ -58,6 +50,7 @@ public class ViewListingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootview =  inflater.inflate(R.layout.fragment_all_listings, container, false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -78,8 +71,6 @@ public class ViewListingsFragment extends Fragment {
 
 
         Query listingsQuery = getQuery();
-
-
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Listing>()
                 .setQuery(listingsQuery, Listing.class)
                 .build();
@@ -104,11 +95,10 @@ public class ViewListingsFragment extends Fragment {
                         // Launch ListingDetailActivity
                         Intent intent = new Intent(getContext(), ListingDetailActivity.class);
                         intent.putExtra("postKey", postKey);
-                        startActivity(intent);
+                        //Start Listing Detail activity
+                        startActivityForResult(intent, 2);
                     }
                 });
-
-
 
                 // Bind Post to ViewHolder
                 viewHolder.bindToListing(model, getContext());
@@ -119,12 +109,28 @@ public class ViewListingsFragment extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        // check if the request code is same as what is passed  here it is 2
+        if(requestCode==2){
+            mCallback.createListing();
+        }
+        else if(requestCode==3){
+            mCallback.editAccount();
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         if (mAdapter != null) {
             mAdapter.startListening();
         }
+
+        mCallback.setToolbarText("BUY");
         mRecycler = rootview.findViewById(R.id.posts_list);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -144,17 +150,15 @@ public class ViewListingsFragment extends Fragment {
 
 
 
-   /* public String setCategory(String category){
-        return this.category = category;
-    }
-    public Query getQuery(String category){
-        return FirebaseDatabase.getInstance().getReference().child("listings").limitToLast(50);
-    }
-*/
 
+    /*--------------------------------
+    Interface
+     -------------------------------*/
     public interface OnViewListings    {
-       // public String getCategory();
-    }
+        public void createListing();
+        public void setToolbarText(String text);
+        public void editAccount();
+        }
 
     @Override
     public void onAttach(Activity activity) {

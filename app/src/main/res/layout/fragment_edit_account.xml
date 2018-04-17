@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,54 +8,97 @@
     android:padding="30dp"
     tools:context="com.kierrapalmer.gem.Fragments.EditAccountFragment">
 
+    <ImageView
+        android:id="@+id/account_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
+        android:id="@+id/tvEditPhoto"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Contact Info"
-        android:textSize="20dp"/>
-
-
-    <EditText
-        android:id="@+id/editAccountEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:hint="@string/email"/>
-
-    <EditText
-        android:id="@+id/edtAccountPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="@string/password"
-        android:editable="false"/>
+        android:layout_height="26dp"
+        android:layout_marginStart="116dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/edit_photo"
+        android:textColor="@color/colorPrimary"
+        android:textSize="15sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/account_image" />
 
 
     <EditText
         android:id="@+id/editAccountFirst"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/first_name"/>
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="68dp"
+        android:hint="@string/first_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/account_image" />
 
-
+    <EditText
+        android:id="@+id/editAccountEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="24dp"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editAccountFirst"
+        android:layout_marginRight="8dp" />
 
     <EditText
         android:id="@+id/editAccountPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:hint="@string/phone"
         android:inputType="phone"
-        android:hint="@string/phone"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editAccountEmail"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="8dp" />
 
-    <RelativeLayout
+    <EditText
+        android:id="@+id/edtAccountPassword"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/btnSave"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:editable="false"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editAccountPhone" />
+
+
+    <TextView
+        android:id="@+id/tvLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/log_out"
+        android:textColor="@color/colorAccent"
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtAccountPassword" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

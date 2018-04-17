@@ -1,14 +1,12 @@
 package com.kierrapalmer.gem.Fragments;
 
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +17,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,8 +28,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kierrapalmer.gem.CircleTransform;
 import com.kierrapalmer.gem.Models.User;
 import com.kierrapalmer.gem.R;
+import com.squareup.picasso.Picasso;
 
 
 /**
@@ -37,14 +39,15 @@ import com.kierrapalmer.gem.R;
  */
 public class EditAccountFragment extends DialogFragment {
     private View rootview;
-    private EditText edtEmail, edtFirst, edtPhone;
-    private Button btnSave;
+    private EditText edtEmail, edtFirst, edtPhone, edtPassword;
+    private TextView tvLogout;
 
     private User dUser;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     private FirebaseUser mUser;
     private String userId;
+    private OnEditAccountListener mCallback;
 
     private static final String TAG = "authTag";
 
@@ -58,6 +61,8 @@ public class EditAccountFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootview = inflater.inflate(R.layout.fragment_edit_account, container, false);
+        setHasOptionsMenu(true);
+
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mUser = mAuth.getCurrentUser();
@@ -66,12 +71,13 @@ public class EditAccountFragment extends DialogFragment {
         edtFirst = rootview.findViewById(R.id.editAccountFirst);
         edtPhone = rootview.findViewById(R.id.editAccountPhone);
         edtEmail = rootview.findViewById(R.id.editAccountEmail);
+        edtPassword = rootview.findViewById(R.id.edtAccountPassword);
 
-        btnSave = rootview.findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(new View.OnClickListener(){
+        tvLogout = rootview.findViewById(R.id.tvLogout);
+        tvLogout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                editAccountSave();
+                mCallback.signout();
             }
         });
 
@@ -84,6 +90,7 @@ public class EditAccountFragment extends DialogFragment {
                         edtFirst.setText(dUser.getFirst());
                         edtPhone.setText(dUser.getPhone());
                         edtEmail.setText(dUser.getEmail());
+                        edtPassword.setText(dUser.getPassword());
 
                     }
 
@@ -93,9 +100,21 @@ public class EditAccountFragment extends DialogFragment {
                     }
                 });
 
+        ImageView imgView = rootview.findViewById(R.id.account_image);
+        Picasso.with(getContext())
+                .load("https://firebasestorage.googleapis.com/v0/b/gemfirebaseproject.appspot.com/o/images%2Fdefault-user-image.png?alt=media&token=f6a3a768-58d6-4941-a721-f891aba771c5")
+               .transform(new CircleTransform())
+                .fit().centerCrop()
+                .into(imgView);
 
 
         return rootview;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mCallback.setToolbarText("PROFILE");
     }
 
     private void editAccountSave(){
@@ -117,18 +136,41 @@ public class EditAccountFragment extends DialogFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        getActivity().getMenuInflater().inflate(R.menu.menu_main, menu);
+        getActivity().getMenuInflater().inflate(R.menu.menu_account, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        switch (item.getItemId()){
+            case R.id.menu_save:
+                editAccountSave();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
 
-        return super.onOptionsItemSelected(item);
+        }
     }
 
 
+    /*--------------------------------
+    Interface
+     -------------------------------*/
+    public interface OnEditAccountListener    {
+        public void signout();
+        public void setToolbarText(String text);
+        }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mCallback = (OnEditAccountListener) activity;
+        } catch (ClassCastException e)        {
+            throw new ClassCastException(activity.toString() +
+                    "must implement OnEditAccountListener.");
+        }
+    }
 
 
 

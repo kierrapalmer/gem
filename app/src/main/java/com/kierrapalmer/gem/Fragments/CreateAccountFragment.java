@@ -60,20 +60,21 @@ public class CreateAccountFragment extends Fragment {
         edtPassword = rootview.findViewById(R.id.edtPasswordCreate);
         edtFirst = rootview.findViewById(R.id.edtFirst);
         edtPhone = rootview.findViewById(R.id.edtPhone);
-        btnCreate = rootview.findViewById(R.id.btnCreate);
+        btnCreate = rootview.findViewById(R.id.btnCreateAccount);
         btnCreate.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                createAccount(mAuth);
+                createAccount();
             }
         });
 
+
+        //Set phone number filter
         InputFilter filter = new InputFilter() {
 
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
                 if (source.length() > 0) {
-
                     if (!Character.isDigit(source.charAt(0)))
                         return "";
                     else {
@@ -86,11 +87,7 @@ public class CreateAccountFragment extends Fragment {
                         else if (dstart >= 14)
                             return "";
                     }
-
-                } else {
-
                 }
-
                 return null;
 
             }
@@ -103,7 +100,7 @@ public class CreateAccountFragment extends Fragment {
     }
 
 
-    public void createAccount(final FirebaseAuth mAuth){
+    public void createAccount(){
         mAuth.createUserWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -143,6 +140,15 @@ public class CreateAccountFragment extends Fragment {
         mDatabase.child("users").child(userId).setValue(user);
     }
 
+
+
+
+
+
+
+        /*--------------------------------
+    Interface
+     -------------------------------*/
     public interface OnCreateAccountListener   {
         public void viewListingsList();
     }

@@ -2,11 +2,13 @@ package com.kierrapalmer.gem.Fragments;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -79,12 +81,12 @@ public class SignInFragment extends Fragment{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView= inflater.inflate(R.layout.fragment_sign_in, container, false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        btnSignOut = rootView.findViewById(R.id.btnSignOut);
         btnSignIn = rootView.findViewById(R.id.btnSignIn);
-        btnCreateAccount = rootView.findViewById(R.id.btnCreateAccount);
         edtEmail = rootView.findViewById(R.id.edtEmail);
         edtPassword = rootView.findViewById(R.id.edtPassword);
 
@@ -103,35 +105,15 @@ public class SignInFragment extends Fragment{
             public void onClick(View view) {
                 user = mAuth.getCurrentUser();
                 if (user!=null){
-                    Log.d(TAG,"User is logged in");
+                    Log.d(TAG,"User is already logged in");
+                    loggedInAlert();
                 }
                 else{
-                    Log.d(TAG,"User is not logged in");
                     signIn();
                 }
             }
         });
 
-        btnSignOut.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                signOut();
-            }
-        });
-        btnCreateAccount.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                mCallback.createAccount(mAuth);
-            }
-        });
-
-        Button btnViewListings = rootView.findViewById(R.id.btnViewListings);
-        btnViewListings.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                mCallback.viewListingsList();
-            }
-        });
 
         return rootView;
     }
@@ -161,11 +143,11 @@ public class SignInFragment extends Fragment{
     }
 
     public void signOut(){
+        mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
         if(user == null)
             Log.d(TAG, "User is not logged in");
-        Toast.makeText(getContext(),"Signed out",
-                Toast.LENGTH_SHORT).show();
+
     }
 
     public void signIn(){
@@ -190,13 +172,32 @@ public class SignInFragment extends Fragment{
     }
 
 
-
-
-    public void switchFragments(){
-
+    public void loggedInAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Add the buttons
+                builder.setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked signout button
+                        signOut();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog, just dismiss dialog
+                    }
+                });
+        AlertDialog dialog = builder.create();
     }
+
+
+
+
+
+    /*--------------------------------
+Interface
+ -------------------------------*/
     public interface OnSignInListener    {
-        public void createAccount(FirebaseAuth mAuth);
+        public void createAccount();
         public void createListing();
         public void viewListingsList();
     }

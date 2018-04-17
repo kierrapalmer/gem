@@ -1,6 +1,5 @@
 package com.kierrapalmer.gem;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Registry;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.module.AppGlideModule;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,13 +21,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.kierrapalmer.gem.Models.Listing;
 import com.kierrapalmer.gem.Models.User;
 import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
 
 public class ListingDetailActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
@@ -64,6 +56,7 @@ public class ListingDetailActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         tvTitle = findViewById(R.id.detail_title);
@@ -107,17 +100,13 @@ public class ListingDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.search:               //search postings
-                //TODO: Create search feature
-                return true;
             case R.id.create_post:
-                //createListing();
+                setResult(2,getIntent());
+                finish();//finishing activity
                 return true;
-            case R.id.account:               //Account page
-                //TODO: Create account details page
-                return true;
-            case R.id.signout:               //Sign out account
-                //signOut();
+            case R.id.account:
+                setResult(3,getIntent());
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -158,7 +147,16 @@ public class ListingDetailActivity extends AppCompatActivity {
                 // Get List object and use the values to update the UI
                 listing = dataSnapshot.getValue(Listing.class);
                 tvTitle.setText(listing.getTitle());
-                tvPrice.setText(listing.getPrice());
+
+                String stringPrice = listing.getPrice();
+                if(stringPrice!=null) {
+                    stringPrice = stringPrice.replace(",", "");
+                    stringPrice = stringPrice.replace("$", "");
+                    int price = Integer.parseInt(stringPrice);
+                    NumberFormat format = NumberFormat.getCurrencyInstance();
+                    format.setMaximumFractionDigits(0);
+                    tvPrice.setText(format.format(price));
+                }
                 tvZip.setText(listing.getZip());
                 tvDesc.setText(listing.getDesc());
                 getListingUser();
@@ -228,6 +226,7 @@ public class ListingDetailActivity extends AppCompatActivity {
 
 
     }
+
 
 
 

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -65,7 +66,7 @@ public class CreateListingFragment extends DialogFragment {
     private View rootview;
     private String title, price, description, zipcode, phone, email;
     private String category;
-    private Button btnPost, btnUpload;
+    private Button btnUpload;
     private CheckBox chkbox;
     private ImageView imgview;
     private TextView txtEdit;
@@ -75,7 +76,6 @@ public class CreateListingFragment extends DialogFragment {
     private final int PICK_IMAGE_REQUEST = 71;
     private static final String TAG = "listing";
     private String key;
-    private String url;
 
     private FirebaseStorage storage;
     private StorageReference storageReference;
@@ -86,7 +86,7 @@ public class CreateListingFragment extends DialogFragment {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser mUser;
     private DatabaseReference mDatabase;
-
+    private String url;
 
     private static final int MAX_WIDTH = 200;
     private static final int MAX_HEIGHT = 200;
@@ -101,19 +101,13 @@ public class CreateListingFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootview =  inflater.inflate(R.layout.fragment_create_listing, container, false);
+        setHasOptionsMenu(true);
 
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
-        }
-
+        //Firebase info
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
         mAuthListener = new FirebaseAuth.AuthStateListener(){
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -121,16 +115,16 @@ public class CreateListingFragment extends DialogFragment {
             }
         };
 
+        //Set category selector
         spinner = (Spinner) rootview.findViewById(R.id.categorySpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.categories_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        btnPost = rootview.findViewById(R.id.btnPost);
+        //Initial variables
         btnUpload = rootview.findViewById(R.id.btnUpload);
         imgview = rootview.findViewById(R.id.imgView);
-
         txtEdit = rootview.findViewById(R.id.txtEdit);
         txtEdit.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -138,7 +132,6 @@ public class CreateListingFragment extends DialogFragment {
                 mCallback.editAccount();
             }
         });
-
         chkbox = rootview.findViewById(R.id.chkbox);
         chkbox.setChecked(true);
         chkbox.setOnClickListener(new View.OnClickListener(){
@@ -148,17 +141,8 @@ public class CreateListingFragment extends DialogFragment {
             }
         });
 
-        setDefaultPictures();
-        key = mDatabase.child("listings").push().getKey();
-
-
-        btnPost.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                submitListing();
-            }
-        });
-
+        setPicture(null);                                       //sets default picture
+        key = mDatabase.child("listings").push().getKey();      //unique key for new listing
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,17 +150,28 @@ public class CreateListingFragment extends DialogFragment {
             }
         });
 
-
         return rootview;
     }
 
-    private void setDefaultPictures(){
-        Picasso.with(getContext())
-                .load("https://firebasestorage.googleapis.com/v0/b/gemfirebaseproject.appspot.com/o/images%2Fdefault.jpg?alt=media&token=47b12154-2762-418d-8027-31169bcba04e")
-                .resize(MAX_WIDTH, MAX_HEIGHT)
-                .centerCrop()
-                .into(imgview);
+    private void setPicture(@Nullable String picURL){
+        if(picURL==null) {
+            Picasso.with(getContext())
+                    .load("https://firebasestorage.googleapis.com/v0/b/gemfirebaseproject.appspot.com/o/images%2Fdefault.jpg?alt=media&token=47b12154-2762-418d-8027-31169bcba04e")
+                    .fit()
+                    .centerCrop()
+                    .into(imgview);
+        }
+        else{
+            Picasso.with(getContext())
+                    .load(picURL)
+                    .fit()
+                    .centerCrop()
+                    .into(imgview);
+        }
     }
+
+
+    /*---------Create new listing-------------------*/
     private void submitListing() {
         final String userId = mUser.getUid();
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
@@ -193,7 +188,8 @@ public class CreateListingFragment extends DialogFragment {
                         } else {
                             // Write new post
                             writeNewListing();
-                            //Toast.makeText(getActivity(), "Item posted", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Item posted", Toast.LENGTH_SHORT).show();
+                            mCallback.refreshListings();
                             dismiss();
                         }
 
@@ -205,8 +201,6 @@ public class CreateListingFragment extends DialogFragment {
                     }
                 });
     }
-
-
     private void writeNewListing() {
        String sRef;
 
@@ -221,12 +215,12 @@ public class CreateListingFragment extends DialogFragment {
 
         category = spinner.getSelectedItem().toString();
 
-
         phone = mUser.getPhoneNumber();
         email = mUser.getEmail();
 
         if(!chkbox.isChecked()){
             mCallback.editAccount();
+            chkbox.setChecked(true);
         }
         if(title == null || price == null || description == null || zipcode == null){
             Toast.makeText(getContext(),"All fields are required",
@@ -236,17 +230,13 @@ public class CreateListingFragment extends DialogFragment {
             Log.d(TAG, "no listing key");
         }
 
-
-        if(url == null){
-            Toast.makeText(getContext(),"Image URL is empty",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
         String mUserId = mUser.getUid();
         Listing list = new Listing(key, mUserId, url, title, price, category, description, zipcode, phone, email);
 
-        mDatabase.child("listings").child(category).child(key).setValue(list);
+        mDatabase.child("listings").child(key).setValue(list);
     }
+
+    /*---------END Create new listing-------------------*/
 
 
     /*----
@@ -278,6 +268,10 @@ public class CreateListingFragment extends DialogFragment {
         }
     }
 
+
+
+
+    //---Upload Image to Firebase Storage-----//
     private void uploadImage() {
         if (filePath != null) {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -289,7 +283,7 @@ public class CreateListingFragment extends DialogFragment {
 
                 Bitmap bmp = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos); //Decreases image size
                 byte[] data = baos.toByteArray();
                 //uploading the image
                 UploadTask uploadTask2 = ref.putBytes(data);
@@ -298,6 +292,7 @@ public class CreateListingFragment extends DialogFragment {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         url = taskSnapshot.getDownloadUrl().toString();
                         progressDialog.dismiss();
+                        mCallback.createListing(url);
                         Toast.makeText(getActivity(), "Upload successful", Toast.LENGTH_LONG).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -320,6 +315,10 @@ public class CreateListingFragment extends DialogFragment {
         if (mUser==null){
             Log.d(TAG, "No User logged in");
         }
+        if(url != null){
+            setPicture(url);
+        }
+       mCallback.setToolbarText("SELL");
     }
     public void onStop(){
         super.onStop();
@@ -329,8 +328,17 @@ public class CreateListingFragment extends DialogFragment {
     }
 
 
+    public void setURL(String url){
+        this.url = url;
+    }
 
-    //Create full screen dialog
+
+
+
+
+    /*--------------------------------
+        Full Screen Dialog
+      -------------------------------*/
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -341,24 +349,34 @@ public class CreateListingFragment extends DialogFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        getActivity().getMenuInflater().inflate(R.menu.menu_main, menu);
+        getActivity().getMenuInflater().inflate(R.menu.menu_account, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == android.R.id.home) {
-            // handle close button click here
-            dismiss();
-            return true;
+
+        switch (item.getItemId()) {
+            case R.id.menu_save:
+                submitListing();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
 
+
+
+    /*--------------------------------
+    Interface
+     -------------------------------*/
+
     public interface OnCreateListingListener    {
         public void editAccount();
+        public void setToolbarText(String text);
+        public void createListing(String url);
+        public void refreshListings();
     }
 
     @Override

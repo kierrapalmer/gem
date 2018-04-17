@@ -10,11 +10,22 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@drawable/gradient2"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-       />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <TextView
+            android:id="@+id/tvToolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buy"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textScaleX="1.2"
+            />
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -24,81 +35,117 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
+            android:orientation="vertical"            >
             <ImageView
                 android:id="@+id/detail_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxHeight="400dp"
                 android:minHeight="200dp" />
-
-            <TextView
-                android:id="@+id/detail_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Title"
-                android:textSize="30dp"/>
-
-            <TextView
-                android:id="@+id/detail_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$0.00"
-                android:textColor="@color/colorAccent"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/detail_zip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="88888"
-                android:textSize="20dp"
-                android:paddingBottom="10dp"/>
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2dip"
-                android:background="#888" />
-            <TextView
-                android:id="@+id/detail_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="@string/first_name"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/detail_call"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@android:drawable/stat_sys_phone_call"
-                    android:text="Call"     />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_margin="10dp">
 
-                <Button
-                    android:id="@+id/detail_email"
+                <TextView
+                    android:id="@+id/detail_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/price_default"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20dp"
+                    android:drawableEnd="@drawable/ic_favorite_border_24dp"
+                    android:drawableRight="@drawable/ic_favorite_border_24dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp" />
+
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#888"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    android:id="@+id/detail_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@android:drawable/ic_dialog_email"
-                    android:text="Email"  />
+                    android:text="@string/title"
+                    android:textColor="@color/black"
+                    android:textSize="25dp"/>
+
+
+                  <TextView
+                    android:id="@+id/detail_zip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/_88888"
+                    android:textSize="15sp"
+                      android:textColor="#999"
+                    android:drawableLeft="@drawable/ic_location_on_black_24dp"
+                    android:paddingBottom="10dp"/>
+
+                <TextView
+                    android:id="@+id/detail_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:text="@string/Lorem"/>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#888" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:text="Seller Information"
+                    android:textSize="20dp"/>
+
+                <TextView
+                    android:id="@+id/detail_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:text="@string/first_name"
+                    android:textStyle="bold"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/detail_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/call"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:drawableLeft="@drawable/ic_phone_black_24dp"
+                        android:background="@drawable/contact_button_background"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:padding="5dp"/>
+
+                    <Button
+                        android:id="@+id/detail_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_email_black_24dp"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:background="@drawable/contact_button_background"
+                        android:text="@string/email"
+                        android:padding="5dp"/>
+                </LinearLayout>
             </LinearLayout>
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2dip"
-                android:background="#888" />
 
-            <TextView
-                android:id="@+id/detail_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="20dp"
-                android:text="@string/Lorem"/>
 
 
         </LinearLayout>
